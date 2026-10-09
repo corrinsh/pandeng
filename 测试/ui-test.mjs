@@ -1,6 +1,8 @@
 /* 攀登 · CDP 端到端验收
-   视口固定为荣耀 600 Pro：421 x 909 @ DPR 3
-   运行： node 测试/ui-test.mjs
+   视口固定为荣耀 600 Pro：361 x 779 @ DPR 3.5（从真机截图反推校准）
+   运行：
+     node 测试/ui-test.mjs                                   # 打本地服务
+     node 测试/ui-test.mjs https://corrinsh.github.io/pandeng/  # 打线上地址
 */
 import { spawn } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -8,11 +10,15 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const SHOTS = join(HERE, 'shots');
+
+const LOCAL = 'http://127.0.0.1:8099/';
+const EDGE = 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
+const BASE = process.argv[2] || LOCAL;
+const IS_LIVE = BASE !== LOCAL;
+/* 打线上时截图另存一份，别覆盖本地那套 */
+const SHOTS = join(HERE, IS_LIVE ? 'shots-live' : 'shots');
 mkdirSync(SHOTS, { recursive: true });
 
-const EDGE = 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
-const BASE = 'http://127.0.0.1:8099/';
 /* 荣耀 600 Pro 的真实参数（从 Corrin 的截图反推校准过）：
    1264x2728 物理像素，DPR = 3.5 → CSS 视口 361.1 x 779.4
    校准依据：章节分隔线实测 1127 物理像素、左起 x=70，
