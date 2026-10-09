@@ -1,12 +1,16 @@
-"""把 测试/shots 下的截图拼成一张联络表，便于一眼看完整个流程。
+"""把截图目录拼成一张联络表，便于一眼看完整个流程。
 
-用法: python 测试/make-sheet.py
+用法:
+  python 测试/make-sheet.py                 # 拼 测试/shots（本地验收）
+  python 测试/make-sheet.py shots-live      # 拼 测试/shots-live（线上验收）
 """
 import os
+import sys
 from PIL import Image, ImageDraw
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SHOTS = os.path.join(ROOT, "测试", "shots")
+DIRNAME = sys.argv[1] if len(sys.argv) > 1 else "shots"
+SHOTS = os.path.join(ROOT, "测试", DIRNAME)
 
 NAMES = [
     "01-select",
