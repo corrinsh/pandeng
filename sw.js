@@ -1,6 +1,6 @@
 /* 攀登 · Service Worker（离线可玩） */
 
-const CACHE = 'climb-v9';
+const CACHE = 'climb-v10';
 
 const SHELL = [
   './',

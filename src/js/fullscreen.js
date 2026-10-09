@@ -1,14 +1,17 @@
-/* 攀登 · 浏览器模式逃生口
+/* 攀登 · 浏览器模式适配
    ============================================================
-   背景：国产手机浏览器的「添加到桌面」不一定给到真正的 PWA 独立窗口，
-   有时只生成一个书签 —— 打开后仍带地址栏 + 底部工具栏，观感直接崩回网页。
+   背景：国产手机浏览器对 PWA 的支持差异极大。
+     · 华为浏览器 / Chrome / Edge：能创建真正的独立窗口（无地址栏、无工具栏）
+     · 荣耀浏览器：只对白名单站点（百度/知乎/京东这类）开放独立窗口，
+       其他站点「添加到桌面」只生成一个书签 —— 点开就是浏览器本体。
+   本模块给出两条不依赖浏览器 PWA 支持的兜底路径：
 
-   这个模块做两件事：
-   1. 检测当前是不是独立窗口模式（standalone / fullscreen / iOS 的 navigator.standalone）
-   2. 不是的话，在顶部挂一条极窄的提示条，点一下用 Fullscreen API 把浏览器界面顶走
+   1. **自动全屏**（默认）：首次点击页面任意位置时调 Fullscreen API，
+      把地址栏和底部工具栏一起顶走。虽不是真独立窗口，但视觉是沉浸的。
+   2. **一键安装**：如果浏览器抛了 beforeinstallprompt（说明它支持真安装），
+      提示条改成「把「攀登」装到桌面」，点一下直接调起系统安装。
 
-   全屏是「本机可达的最后手段」，不依赖服务器或 manifest 支持。
-   注意：Fullscreen API 必须由用户手势触发，所以不能自动执行，只能给按钮。 */
+   加 ?nofs=1 可关掉自动全屏（验收脚本用，用户不爱也可手动加）。 */
 
 const KEY_DISMISS = 'climb.fsHintDismissed';
 
@@ -48,26 +51,36 @@ function exitFull() {
   try { const p = fn.call(document); if (p && p.catch) p.catch(() => {}); } catch (e) {}
 }
 
+/** 是否允许自动全屏（?nofs=1 关闭） */
+function autoAllowed() {
+  try {
+    return !/[?&]nofs=1/.test(location.search);
+  } catch (e) { return true; }
+}
+
 /**
  * 挂载提示条（已在独立窗口时什么都不做）。
  * @returns {boolean} 是否已处于独立窗口模式
  */
 export function mountFullscreenHint() {
   const standalone = isStandalone();
+  const auto = autoAllowed() && !standalone;
 
   /* 调试 / 自动化验收用 */
   window.__CLIMB_FS = {
     standalone,
     fullscreenApi: isFullscreenApi(),
+    autoArmed: false,
+    installAvailable: false,
     request: requestFull,
     exit: exitFull
   };
 
-  if (standalone || isFullscreenApi()) return standalone;
+  if (standalone) return true;
 
   let dismissed = false;
   try { dismissed = sessionStorage.getItem(KEY_DISMISS) === '1'; } catch (e) {}
-  if (dismissed) return standalone;
+  if (dismissed) return false;
 
   const host = document.getElementById('app') || document.body;
 
@@ -78,11 +91,9 @@ export function mountFullscreenHint() {
 
   const label = document.createElement('span');
   label.className = 'fsbar__label';
-  label.textContent = '浏览器模式 · 点这里全屏';
 
   const mark = document.createElement('span');
   mark.className = 'fsbar__mark';
-  mark.textContent = '⛶';
   mark.setAttribute('aria-hidden', 'true');
 
   const close = document.createElement('button');
@@ -94,6 +105,19 @@ export function mountFullscreenHint() {
   bar.appendChild(label);
   bar.appendChild(mark);
   bar.appendChild(close);
+
+  let deferredInstall = null;
+
+  function applyMode() {
+    if (deferredInstall) {
+      label.textContent = '把「攀登」装到桌面';
+      mark.textContent = '↓';
+    } else {
+      label.textContent = '浏览器模式 · 点这里全屏';
+      mark.textContent = '⛶';
+    }
+  }
+  applyMode();
 
   const drop = () => {
     bar.classList.add('fsbar--out');
@@ -108,14 +132,55 @@ export function mountFullscreenHint() {
   });
 
   bar.addEventListener('click', () => {
-    if (!requestFull()) label.textContent = '这台浏览器不支持全屏 · 请用「添加到主屏幕」重装';
+    if (deferredInstall) {
+      const ev = deferredInstall;
+      deferredInstall = null;
+      try { ev.prompt(); } catch (e) {}
+      if (ev.userChoice && ev.userChoice.then) {
+        ev.userChoice.then((r) => {
+          if (r && r.outcome === 'accepted') drop();
+        }).catch(() => {});
+      }
+      return;
+    }
+    if (!requestFull()) {
+      label.textContent = '这台浏览器不支持全屏 · 建议装 Chrome 后用「安装应用」';
+    }
   });
 
-  document.addEventListener('fullscreenchange', () => { if (isFullscreenApi()) drop(); });
+  document.addEventListener('fullscreenchange', () => {
+    if (isFullscreenApi()) drop();
+  });
+
+  /* 浏览器支持真安装时，优先引导安装（比较全屏更接近"真 App"） */
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstall = e;
+    window.__CLIMB_FS.installAvailable = true;
+    window.__CLIMB_FS.autoArmed = false;
+    applyMode();
+  });
+  window.addEventListener('appinstalled', () => {
+    deferredInstall = null;
+    drop();
+  });
+
+  /* 自动全屏：首次点击任意位置触发（点提示条本身不算） */
+  if (auto) {
+    const autoFull = (ev) => {
+      if (deferredInstall) { document.removeEventListener('click', autoFull, true); return; }
+      if (ev.target && bar.contains(ev.target)) return;
+      document.removeEventListener('click', autoFull, true);
+      window.__CLIMB_FS.autoArmed = false;
+      requestFull();
+    };
+    document.addEventListener('click', autoFull, true);
+    window.__CLIMB_FS.autoArmed = true;
+  }
 
   host.insertBefore(bar, host.firstChild);
   host.classList.add('app--fsbar');
   requestAnimationFrame(() => bar.classList.add('fsbar--in'));
 
-  return standalone;
+  return false;
 }

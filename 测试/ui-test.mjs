@@ -15,6 +15,10 @@ const LOCAL = 'http://127.0.0.1:8099/';
 const EDGE = 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 const BASE = process.argv[2] || LOCAL;
 const IS_LIVE = BASE !== LOCAL;
+/* 主流程带 nofs=1 关掉「首次点击自动全屏」：
+   无头浏览器里进全屏会让后续截图的分辨率不稳定，属于测试环境问题不是产品问题。
+   自动全屏本身在最后单独验证一次。 */
+const NAV = BASE + (BASE.includes('?') ? '&' : '?') + 'nofs=1';
 /* 打线上时截图另存一份，别覆盖本地那套 */
 const SHOTS = join(HERE, IS_LIVE ? 'shots-live' : 'shots');
 mkdirSync(SHOTS, { recursive: true });
@@ -151,7 +155,7 @@ async function main() {
   /* ---------- 1. 首屏 ---------- */
   let loaded = 0;
   for (let attempt = 1; attempt <= 3; attempt++) {
-    await send('Page.navigate', { url: BASE });
+    await send('Page.navigate', { url: NAV });
     try {
       await waitFor(`document.querySelector('.world') !== null`, 12000, '选档页渲染');
       loaded = attempt;
@@ -203,6 +207,13 @@ async function main() {
   if (fsState === false) {
     const barText = await evaluate(`(document.querySelector('.fsbar__label') || {}).textContent || ''`);
     barText ? ok('浏览器模式下已挂全屏提示条：' + barText) : bad('浏览器模式未挂全屏提示条');
+    const fsFlags = JSON.parse(await evaluate(`JSON.stringify({
+      autoArmed: (window.__CLIMB_FS || {}).autoArmed,
+      installAvailable: (window.__CLIMB_FS || {}).installAvailable
+    })`));
+    fsFlags.autoArmed === false
+      ? ok('?nofs=1 已正确关闭自动全屏')
+      : bad('nofs=1 没生效，自动全屏仍处于待触发状态', fsFlags);
     await evaluate(`document.querySelector('.fsbar__close').click()`);
     await sleep(400);
     const gone = await evaluate(`document.querySelector('.fsbar') === null`);
@@ -549,6 +560,28 @@ async function main() {
     await evaluate(`document.querySelector('.topbar__back').click()`);
     await waitFor(`document.querySelectorAll('.world').length === 3`, 6000, '返回选档页');
   }
+
+  /* ---------- 10. 非独立窗口下的「出路」----------
+     荣耀浏览器这类不支持 PWA 安装的浏览器，光靠提示条不够，要给它一条可用动作：
+       · 浏览器支持真安装（抛了 beforeinstallprompt）→ 提示条变成「把「攀登」装到桌面」
+       · 否则 → 首次点击任意位置自动进全屏
+     这里验证的是这个不变量，而不是某一条路径（环境不同走的路径不同）。 */
+  await evaluate(`try { sessionStorage.clear(); } catch (e) {}`);
+  await send('Page.navigate', { url: BASE });
+  await waitFor(`document.querySelector('.world') !== null`, 15000, '不带 nofs 时首屏');
+  await sleep(1200);
+  const fin = JSON.parse(await evaluate(`JSON.stringify({
+    autoArmed: (window.__CLIMB_FS || {}).autoArmed === true,
+    installAvailable: (window.__CLIMB_FS || {}).installAvailable === true,
+    hasBar: !!document.querySelector('.fsbar'),
+    label: (document.querySelector('.fsbar__label') || {}).textContent || ''
+  })`));
+  fin.hasBar ? ok(`非独立窗口下提示条挂出：${fin.label}`) : bad('非独立窗口下没有挂出提示条', fin);
+  (fin.autoArmed || fin.installAvailable)
+    ? ok('提示条提供了可用出路：'
+        + (fin.installAvailable ? '一键安装（此浏览器支持真正的 PWA 安装）' : '首次点击自动全屏'))
+    : bad('提示条没有任何可用动作，用户被困在浏览器里', fin);
+  await shot('10-browser-mode');
 
   report.errors.length === 0
     ? ok('全程无页面报错' + (report.warnings.length ? `（另有 ${report.warnings.length} 次连接抖动，非代码问题）` : ''))

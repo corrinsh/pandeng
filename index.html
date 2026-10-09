@@ -18,7 +18,7 @@
    表现成"改了但你看不到"。这里主动把旧的清干净，用 ?v= 参数保证这一次一定走网络。
    localStorage 里的标记保证只执行一次，不会死循环。 */
 (function () {
-  var V = 'v9';
+  var V = 'v10';
   var KEY = 'climb.migrated';
   try { if (localStorage.getItem(KEY) === V) return; } catch (e) { return; }
   var removed = 0;
@@ -45,16 +45,16 @@
   });
 })();
 </script>
-<!-- ?v=9 是缓存破除标记：手机上可能残留着旧 Service Worker 的"缓存优先"副本，
+<!-- ?v=10 是缓存破除标记：手机上可能残留着旧 Service Worker 的"缓存优先"副本，
      带版本号的 URL 在老缓存里查不到，只能走网络拿到新文件。
      每次发版把这个数字 +1，并同步 bump sw.js 里的 CACHE。 -->
-<link rel="manifest" href="manifest.json?v=9">
-<link rel="icon" href="assets/icon.svg?v=9" type="image/svg+xml">
-<link rel="apple-touch-icon" href="assets/icon-180.png?v=9">
-<link rel="stylesheet" href="src/css/tokens.css?v=9">
-<link rel="stylesheet" href="src/css/base.css?v=9">
-<link rel="stylesheet" href="src/css/skins.css?v=9">
-<link rel="stylesheet" href="src/css/screens.css?v=9">
+<link rel="manifest" href="manifest.json?v=10">
+<link rel="icon" href="assets/icon.svg?v=10" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icon-180.png?v=10">
+<link rel="stylesheet" href="src/css/tokens.css?v=10">
+<link rel="stylesheet" href="src/css/base.css?v=10">
+<link rel="stylesheet" href="src/css/skins.css?v=10">
+<link rel="stylesheet" href="src/css/screens.css?v=10">
 </head>
 <body>
 <div class="boot" id="boot">
@@ -78,6 +78,6 @@
   <div class="noscript">这个应用需要开启 JavaScript 才能运行。</div>
 </noscript>
 
-<script type="module" src="src/js/main.js?v=9"></script>
+<script type="module" src="src/js/main.js?v=10"></script>
 </body>
 </html>
