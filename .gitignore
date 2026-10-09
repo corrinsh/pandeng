@@ -1,0 +1,16 @@
+# 项目内部记忆 / WorkBuddy 元数据 —— 绝不外传
+.workbuddy/
+
+# 验收截图：本地产物，体积大（3.5MB），不进仓库
+测试/shots/
+
+# 本地便利文件
+扫码打开.png
+_mime-test.json
+
+# 临时与系统文件
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+desktop.ini
