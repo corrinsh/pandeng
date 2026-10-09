@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-tier="none">
+<head>
+<meta charset="utf-8">
+<title>攀登</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no,maximum-scale=1">
+<meta name="theme-color" content="#0E0F10">
+<meta name="color-scheme" content="light dark">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="攀登">
+<meta name="format-detection" content="telephone=no,email=no,address=no">
+
+<script>
+/* 缓存迁移：清掉历史版本遗留的 Service Worker 与所有缓存，清完带版本参数重载一次。
+   为什么需要：手机上可能残留着旧版 SW 的"缓存优先"副本，它会把旧文件一直喂给你，
+   表现成"改了但你看不到"。这里主动把旧的清干净，用 ?v= 参数保证这一次一定走网络。
+   localStorage 里的标记保证只执行一次，不会死循环。 */
+(function () {
+  var V = 'v9';
+  var KEY = 'climb.migrated';
+  try { if (localStorage.getItem(KEY) === V) return; } catch (e) { return; }
+  var removed = 0;
+  var jobs = [];
+  if (navigator.serviceWorker) {
+    jobs.push(navigator.serviceWorker.getRegistrations().then(function (rs) {
+      return Promise.all(rs.map(function (r) { removed++; return r.unregister(); }));
+    }));
+  }
+  if (window.caches) {
+    jobs.push(caches.keys().then(function (ks) {
+      return Promise.all(ks.map(function (k) { removed++; return caches.delete(k); }));
+    }));
+  }
+  Promise.all(jobs).then(function () {
+    try { localStorage.setItem(KEY, V); } catch (e) {}
+    if (!removed) return;
+    var u = new URL(location.href);
+    u.searchParams.set('v', V);
+    if (u.href !== location.href) location.replace(u.href);
+    else location.reload();
+  }).catch(function () {
+    try { localStorage.setItem(KEY, V); } catch (e) {}
+  });
+})();
+</script>
+<!-- ?v=9 是缓存破除标记：手机上可能残留着旧 Service Worker 的"缓存优先"副本，
+     带版本号的 URL 在老缓存里查不到，只能走网络拿到新文件。
+     每次发版把这个数字 +1，并同步 bump sw.js 里的 CACHE。 -->
+<link rel="manifest" href="manifest.json?v=9">
+<link rel="icon" href="assets/icon.svg?v=9" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icon-180.png?v=9">
+<link rel="stylesheet" href="src/css/tokens.css?v=9">
+<link rel="stylesheet" href="src/css/base.css?v=9">
+<link rel="stylesheet" href="src/css/skins.css?v=9">
+<link rel="stylesheet" href="src/css/screens.css?v=9">
+</head>
+<body>
+<div class="boot" id="boot">
+  <div class="boot__mark" aria-hidden="true">
+    <svg viewBox="0 0 120 68" width="120" height="68">
+      <path d="M4 64 L38 14 L58 40 L74 20 L116 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+      <circle cx="38" cy="14" r="3.5" fill="currentColor"/>
+    </svg>
+  </div>
+  <div class="boot__name">攀登</div>
+  <div class="boot__sub">CLIMB · AI 认知训练</div>
+</div>
+
+<div class="app" id="app" data-tier="none">
+  <div class="app__bar" id="appbar" role="banner"></div>
+  <main class="app__body" id="screen" role="main"></main>
+  <div class="app__foot" id="appfoot" role="contentinfo"></div>
+</div>
+
+<noscript>
+  <div class="noscript">这个应用需要开启 JavaScript 才能运行。</div>
+</noscript>
+
+<script type="module" src="src/js/main.js?v=9"></script>
+</body>
+</html>

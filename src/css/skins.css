@@ -1,0 +1,152 @@
+/* ============================================================
+   攀登 · skins.css
+   视觉方向 A「仪器」—— 三档共用同一套语言，只换强调色与底色色温
+
+   共用（不许改）：方角、1px 精密细线、2px 状态标记条、等宽读数、
+                   四角角标、统一的转场曲线
+   分家（只有这两项）：
+     · 强调色    山脚 琥珀 #E0A33A  |  山腰 青 #4FB3A5  |  山巅 冰蓝 #8FB4D9
+     · 底色色温  暖炭 #100F0D       |  中性炭 #0E1011   |  冷炭 #0D0E12
+   ============================================================ */
+
+/* ---------- 中性态（启动页 / 选档页）---------- */
+html[data-tier="none"] {
+  --bg: #0E0F10;
+  --bg-2: #16181A;
+  --bg-3: #1C1F22;
+  --ink: #E6E4E0;
+  --ink-2: #8A8D90;
+  --ink-3: #4A4D50;
+  --line: #2A2D30;
+  --line-2: #3A3E42;
+  --accent: #C9A227;
+  --accent-ink: #0E0F10;
+  --ok: #5FBF7F;
+  --bad: #D4544A;
+  --bw: 1px;
+  --ok-wash: rgba(95, 191, 127, .17);
+  --bad-wash: rgba(212, 84, 74, .17);
+}
+
+/* ============================================================
+   山脚 · 琥珀（暖炭）
+   ============================================================ */
+html[data-tier="foothill"] {
+  --bg: #100F0D;
+  --bg-2: #181613;
+  --bg-3: #201D19;
+  --ink: #E8E4DC;
+  --ink-2: #918A7E;
+  --ink-3: #4E4A42;
+  --line: #2E2B26;
+  --line-2: #3E3A33;
+  --accent: #E0A33A;
+  --accent-ink: #14110C;
+  --ok: #6FBF7F;
+  --bad: #D9564A;
+  --bw: 1px;
+  --ok-wash: rgba(111, 191, 127, .17);
+  --bad-wash: rgba(217, 86, 74, .17);
+}
+
+/* ============================================================
+   山腰 · 青（中性炭）
+   ============================================================ */
+html[data-tier="midway"] {
+  --bg: #0E1011;
+  --bg-2: #15191A;
+  --bg-3: #1C2123;
+  --ink: #E2E6E5;
+  --ink-2: #87908F;
+  --ink-3: #49504F;
+  --line: #2A3033;
+  --line-2: #394043;
+  --accent: #4FB3A5;
+  --accent-ink: #06201D;
+  --ok: #6FC08A;
+  --bad: #D9564A;
+  --bw: 1px;
+  --ok-wash: rgba(111, 192, 138, .17);
+  --bad-wash: rgba(217, 86, 74, .17);
+}
+
+/* ============================================================
+   山巅 · 冰蓝（冷炭）+ 全等宽读数
+   ============================================================ */
+html[data-tier="summit"] {
+  --bg: #0D0E12;
+  --bg-2: #14161C;
+  --bg-3: #1A1D25;
+  --ink: #E2E6EE;
+  --ink-2: #8690A0;
+  --ink-3: #474E5C;
+  --line: #272A33;
+  --line-2: #363A45;
+  --accent: #8FB4D9;
+  --accent-ink: #0A0E14;
+  --ok: #6FC08A;
+  --bad: #D9564A;
+  --bw: 1px;
+  --ok-wash: rgba(111, 192, 138, .17);
+  --bad-wash: rgba(217, 86, 74, .17);
+}
+
+/* ============================================================
+   三档共用的仪器语言（结构层，不许被皮肤覆盖）
+   ============================================================ */
+
+/* 读数类文字一律等宽 + 表格数字：数字跳动时不位移 */
+.screen__kicker,
+.q__index,
+.q__hint,
+.topbar__meta,
+.topbar__title,
+.world__idx,
+.world__badge,
+.chapter__no,
+.chapter__note,
+.lvnode__no,
+.lvnode__state,
+.result__k,
+.result__dot,
+.explain__k,
+.takeaway__k,
+.brief__h::before,
+.verdict__mark,
+.verdict__sub,
+.btn,
+.select__ver,
+.map__label {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 山巅：题面与讲解标题也走等宽，整体更像终端 */
+html[data-tier="summit"] .q__text,
+html[data-tier="summit"] .brief__h,
+html[data-tier="summit"] .screen__title,
+html[data-tier="summit"] .world__name,
+html[data-tier="summit"] .lvnode__title {
+  font-family: var(--font-mono);
+  letter-spacing: .01em;
+}
+
+/* ---------- 强调线（**加粗** 的下划线色）：比主色暗一档，像手册里的荧光笔 ---------- */
+html[data-tier="none"]     { --em: rgba(201, 162, 39, .55); }
+html[data-tier="foothill"] { --em: rgba(224, 163, 58, .55); }
+html[data-tier="midway"]   { --em: rgba(79, 179, 165, .55); }
+html[data-tier="summit"]   { --em: rgba(143, 180, 217, .55); }
+
+/* ---------- 统一的「刻度归位」转场 ----------
+   新屏从下推入 14px，旧屏向上抽走 8px。
+   三档共用，因为这是同一台机器的行为，不是三种机器的行为。 */
+@keyframes ins-in {
+  from { opacity: 0; transform: translate3d(0, 14px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes ins-out {
+  from { opacity: 1; transform: none; }
+  to   { opacity: 0; transform: translate3d(0, -8px, 0); }
+}
+::view-transition-new(root) { animation: ins-in var(--dur-3) var(--ease-out) both; }
+::view-transition-old(root) { animation: ins-out var(--dur-2) var(--ease-in-out) both; }

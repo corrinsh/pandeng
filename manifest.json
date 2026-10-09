@@ -1,0 +1,18 @@
+{
+  "name": "攀登",
+  "short_name": "攀登",
+  "description": "AI · 大模型 · Agent 认知训练",
+  "lang": "zh-CN",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "fullscreen"],
+  "orientation": "portrait",
+  "background_color": "#0E0F10",
+  "theme_color": "#0E0F10",
+  "icons": [
+    { "src": "assets/icon-192.png?v=9", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icon-512.png?v=9", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icon-maskable-512.png?v=9", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

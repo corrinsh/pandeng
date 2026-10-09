@@ -1,0 +1,403 @@
+/* ============================================================
+   攀登 · screens.css
+   选档页 / 关卡地图 / 关卡流程 的布局与专属组件
+   视觉方向 A「仪器」
+   ============================================================ */
+
+/* ================= 选档页 ================= */
+.world {
+  position: relative;
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: var(--s4);
+  margin-bottom: var(--s3);
+  border-radius: var(--radius, 2px);
+  background: var(--bg-2, #16181A);
+  border: var(--bw, 1px) solid var(--line, #2A2D30);
+  box-shadow: inset 3px 0 0 0 var(--w, #C9A227);
+  overflow: hidden;
+  transition: transform var(--dur-1) var(--ease-spring),
+              border-color var(--dur-2) var(--ease-out);
+}
+/* 对角角标 */
+.world::before,
+.world::after {
+  content: "";
+  position: absolute;
+  width: var(--bracket, 9px);
+  height: var(--bracket, 9px);
+  opacity: .7;
+  pointer-events: none;
+}
+.world::before {
+  top: -1px; right: -1px;
+  border-top: 2px solid var(--w, #C9A227);
+  border-right: 2px solid var(--w, #C9A227);
+}
+.world::after {
+  bottom: -1px; right: -1px;
+  border-bottom: 2px solid var(--w, #C9A227);
+  border-right: 2px solid var(--w, #C9A227);
+}
+.world:active { transform: scale(.99); }
+
+/* 三档强调色：与 skins.css 保持一致 */
+.world--foothill { --w: #E0A33A; }
+.world--midway   { --w: #4FB3A5; }
+.world--summit   { --w: #8FB4D9; }
+.world--soon { opacity: .74; }
+
+.world__head { display: flex; align-items: center; gap: var(--s3); }
+.world__idx {
+  flex: none;
+  width: 26px;
+  font-size: var(--fs-2xs);
+  letter-spacing: .12em;
+  color: var(--w, #C9A227);
+}
+.world__names { flex: 1 1 auto; display: flex; align-items: baseline; gap: var(--s2); min-width: 0; }
+.world__name { font-size: var(--fs-lg); font-weight: var(--fw-m); letter-spacing: .04em; }
+.world__sub { font-size: var(--fs-2xs); color: var(--ink-3, #4A4D50); }
+.world__badge {
+  flex: none;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm, 1px);
+  border: 1px solid var(--w, #C9A227);
+  font-size: var(--fs-2xs);
+  letter-spacing: .08em;
+  color: var(--w, #C9A227);
+}
+.world__badge--soon { border-color: var(--ink-3, #4A4D50); color: var(--ink-3, #4A4D50); }
+.world__desc {
+  margin-top: var(--s3);
+  font-size: var(--fs-sm);
+  line-height: 1.65;
+  color: var(--ink-2, #8A8D90);
+}
+/* 分段刻度轨道 */
+.world__track {
+  position: relative;
+  margin-top: var(--s4);
+  height: var(--track-h, 5px);
+  background: var(--bg-3, #1C1F22);
+  border: var(--hair, 1px) solid var(--line, #2A2D30);
+  overflow: hidden;
+}
+.world__track::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    90deg, transparent 0 7px, var(--bg, #0E0F10) 7px 9px);
+}
+.world__fill {
+  height: 100%;
+  background: var(--w, #C9A227);
+  transform-origin: left center;
+  transition: transform var(--dur-3) var(--ease-out);
+}
+.world__foot { margin-top: var(--s2); font-family: var(--font-mono); font-size: var(--fs-2xs); letter-spacing: .08em; color: var(--ink-3, #4A4D50); }
+
+.select__note {
+  margin-top: var(--s5);
+  font-size: var(--fs-xs);
+  line-height: 1.75;
+  text-align: center;
+  color: var(--ink-3, #4A4D50);
+}
+.select__ver {
+  margin-top: var(--s3);
+  font-size: var(--fs-2xs);
+  letter-spacing: .1em;
+  color: var(--ink-3, #4A4D50);
+  opacity: .75;
+  text-align: center;
+}
+
+/* ================= 关卡地图 ================= */
+.map__track {
+  position: relative;
+  height: var(--track-h, 5px);
+  margin-bottom: var(--s5);
+  background: var(--bg-3, #1C1F22);
+  border: var(--hair, 1px) solid var(--line, #2A2D30);
+  overflow: hidden;
+}
+.map__track::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    90deg, transparent 0 7px, var(--bg, #0E0F10) 7px 9px);
+}
+.map__fill {
+  height: 100%;
+  background: var(--accent, #C9A227);
+  transform-origin: left center;
+  transition: transform 560ms var(--ease-spring);
+}
+.map__label {
+  font-size: var(--fs-2xs);
+  letter-spacing: .16em;
+  color: var(--ink-3, #4A4D50);
+}
+.notice {
+  padding: var(--s4);
+  margin-bottom: var(--s5);
+  border: var(--bw, 1px) solid var(--line, #2A2D30);
+  border-left: var(--mark, 2px) solid var(--accent, #C9A227);
+  border-radius: var(--radius, 2px);
+  background: var(--bg-2, #16181A);
+}
+.notice__k {
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  letter-spacing: .2em;
+  color: var(--accent, #C9A227);
+  margin-bottom: var(--s2);
+}
+.notice__p { font-size: var(--fs-sm); line-height: 1.7; color: var(--ink-2, #8A8D90); }
+
+.chapter { margin-bottom: var(--s6); }
+.chapter__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s3);
+  margin-bottom: var(--s3);
+  padding-bottom: var(--s2);
+  border-bottom: var(--rule) solid var(--line, #2A2D30);
+}
+.chapter__no { flex: none; font-size: var(--fs-2xs); letter-spacing: .2em; color: var(--accent, #C9A227); }
+.chapter__title { flex: 1 1 auto; font-size: var(--fs-md); font-weight: var(--fw-m); }
+.chapter__note { flex: none; font-size: var(--fs-2xs); letter-spacing: .08em; color: var(--ink-3, #4A4D50); }
+
+/* 关卡节点 = 刻度轴上的一个刻度 */
+.lvnode {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  width: 100%;
+  padding: var(--s3) var(--s3) var(--s3) var(--s3);
+  text-align: left;
+  border-radius: var(--radius, 2px);
+  border: var(--bw, 1px) solid transparent;
+  border-left: var(--mark, 2px) solid var(--line-2, #3A3E42);
+  transition: transform var(--dur-1) var(--ease-spring),
+              background-color var(--dur-2) var(--ease-out),
+              border-color var(--dur-2) var(--ease-out);
+}
+.lvnode + .lvnode { margin-top: var(--s1); }
+.lvnode:active { transform: scale(.99); }
+.lvnode__no {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: var(--bw, 1px) solid var(--line-2, #3A3E42);
+  border-radius: var(--radius-sm, 1px);
+  font-size: var(--fs-2xs);
+  color: var(--ink-3, #4A4D50);
+  transition: all var(--dur-2) var(--ease-out);
+}
+.lvnode__body { flex: 1 1 auto; min-width: 0; }
+.lvnode__title { display: block; font-size: var(--fs-sm); font-weight: var(--fw-m); }
+.lvnode__hook {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--fs-xs);
+  color: var(--ink-3, #4A4D50);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lvnode__state { flex: none; font-size: var(--fs-2xs); letter-spacing: .08em; color: var(--ink-3, #4A4D50); }
+
+.lvnode--current {
+  background: var(--bg-2, #16181A);
+  border-color: var(--line-2, #3A3E42);
+  border-left-color: var(--accent, #C9A227);
+}
+.lvnode--current .lvnode__no { border-color: var(--accent, #C9A227); color: var(--accent, #C9A227); }
+.lvnode--current .lvnode__state { color: var(--accent, #C9A227); }
+.lvnode--done { border-left-color: var(--ok, #5FBF7F); }
+.lvnode--done .lvnode__no { border-color: var(--ok, #5FBF7F); color: var(--ok, #5FBF7F); }
+.lvnode--done .lvnode__state { color: var(--ok, #5FBF7F); }
+.lvnode--locked { opacity: .5; }
+.lvnode--pending { opacity: .66; }
+.lvnode--locked .lvnode__no { border-style: dashed; }
+
+/* ================= 关卡流程 ================= */
+.level__foot { padding-top: var(--s3); }
+
+/* 讲解：分节 */
+.brief__intro {
+  margin: var(--s3) 0 var(--s5);
+  padding-bottom: var(--s5);
+  border-bottom: var(--rule) solid var(--line, #2A2D30);
+  font-size: var(--fs-sm);
+  line-height: 1.85;
+  color: var(--ink-2, #8A8D90);
+}
+.brief-block { margin-bottom: var(--s6); }
+.brief__h {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  margin-bottom: var(--s3);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-m);
+  letter-spacing: .04em;
+  color: var(--ink, #E6E4E0);
+}
+.brief__h::before {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  background: var(--accent, #C9A227);
+}
+.brief__p {
+  margin-bottom: var(--s3);
+  font-size: var(--fs-md);
+  line-height: var(--lh-body);
+}
+.brief-block > .brief__p:last-child { margin-bottom: 0; }
+.brief__note {
+  margin: var(--s4) 0 0;
+  padding: var(--s3) var(--s4);
+  border-left: var(--mark, 2px) solid var(--accent, #C9A227);
+  border-radius: var(--radius-sm, 1px);
+  background: var(--bg-2, #16181A);
+  font-size: var(--fs-sm);
+  line-height: 1.8;
+  color: var(--ink-2, #8A8D90);
+}
+
+/* 一句话带走 —— 带角标的仪表框 */
+.takeaway {
+  position: relative;
+  padding: var(--s4);
+  border: var(--bw, 1px) solid var(--accent, #C9A227);
+  border-radius: var(--radius, 2px);
+}
+.takeaway::before,
+.takeaway::after {
+  content: "";
+  position: absolute;
+  width: var(--bracket, 9px);
+  height: var(--bracket, 9px);
+  pointer-events: none;
+}
+.takeaway::before {
+  top: -1px; left: -1px;
+  border-top: 2px solid var(--accent, #C9A227);
+  border-left: 2px solid var(--accent, #C9A227);
+}
+.takeaway::after {
+  bottom: -1px; right: -1px;
+  border-bottom: 2px solid var(--accent, #C9A227);
+  border-right: 2px solid var(--accent, #C9A227);
+}
+.takeaway__k {
+  margin-bottom: var(--s2);
+  font-size: var(--fs-2xs);
+  letter-spacing: .2em;
+  color: var(--accent, #C9A227);
+}
+.takeaway__p { font-size: var(--fs-sm); line-height: 1.8; color: var(--ink, #E6E4E0); }
+
+.chkrow {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  margin-top: var(--s5);
+  font-size: var(--fs-xs);
+  color: var(--ink-3, #4A4D50);
+}
+.chk { width: 16px; height: 16px; accent-color: var(--accent, #C9A227); }
+
+.quizwrap { padding-top: var(--s1); }
+.explain {
+  opacity: 0;
+  transform: translate3d(0, 8px, 0);
+  transition: opacity var(--dur-3) var(--ease-out), transform var(--dur-3) var(--ease-out);
+}
+.explain--in { opacity: 1; transform: none; }
+.explain__k {
+  margin-top: var(--s5);
+  font-size: var(--fs-2xs);
+  letter-spacing: .2em;
+  color: var(--accent, #C9A227);
+}
+.explain__p { margin-top: var(--s2); font-size: var(--fs-sm); line-height: 1.8; color: var(--ink-2, #8A8D90); }
+
+.result { padding-top: var(--s2); }
+.result__card { margin-top: var(--s4); }
+.result__k { font-size: var(--fs-2xs); letter-spacing: .18em; color: var(--ink-3, #4A4D50); }
+.result__dots { display: flex; gap: var(--s2); margin-top: var(--s3); }
+.result__dot {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: var(--bw, 1px) solid var(--line-2, #3A3E42);
+  border-radius: var(--radius-sm, 1px);
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3, #4A4D50);
+}
+.result__dot.is-ok { border-color: var(--ok, #5FBF7F); color: var(--ok, #5FBF7F); }
+.result__dot.is-bad { border-color: var(--bad, #D4544A); color: var(--bad, #D4544A); }
+
+/* 结算页的档位进度读数 */
+.result__prog { margin-top: var(--s5); }
+.result__track {
+  position: relative;
+  margin-top: var(--s2);
+  height: var(--track-h, 5px);
+  background: var(--bg-3, #1C1F22);
+  border: var(--hair, 1px) solid var(--line, #2A2D30);
+  overflow: hidden;
+}
+.result__track::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    90deg, transparent 0 7px, var(--bg, #0E0F10) 7px 9px);
+}
+.result__hint {
+  margin-top: var(--s2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  letter-spacing: .08em;
+  color: var(--ink-3, #4A4D50);
+}
+
+/* ================= 提示条 ================= */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(30px + var(--safe-b));
+  z-index: 120;
+  padding: 9px 14px;
+  border-radius: var(--radius, 2px);
+  border: 1px solid var(--line-2, #3A3E42);
+  background: var(--bg-3, #1C1F22);
+  color: var(--ink, #E6E4E0);
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  letter-spacing: .08em;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(-50%, 8px);
+  transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out);
+  pointer-events: none;
+}
+.toast--in { opacity: 1; transform: translate(-50%, 0); }

@@ -1,0 +1,77 @@
+/* ============================================================
+   攀登 · tokens.css
+   共享设计骨架：三档共用这一层，保证三套皮肤仍是同一个产品
+   视觉方向 A「仪器」：深炭底 + 单色强调 + 等宽读数 + 1px 精密细线
+
+   设计基准：361 x 779 CSS px（荣耀 600 Pro 实测 / DPR 3.5）
+   ============================================================ */
+
+:root {
+  /* ---- 间距刻度 4/8/12/16/24/32 ---- */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+
+  /* ---- 字阶 ---- */
+  --fs-2xs: 11px;   /* 等宽标签专用 */
+  --fs-xs: 12px;
+  --fs-sm: 14px;
+  --fs-md: 16px;
+  --fs-lg: 20px;
+  --fs-xl: 24px;
+  --fs-2xl: 32px;
+
+  /* ---- 字重：只用 400 / 500 ---- */
+  --fw-r: 400;
+  --fw-m: 500;
+
+  --lh-tight: 1.28;
+  --lh-body: 1.72;
+
+  /* ---- 仪器线宽 ---- */
+  --hair: 1px;        /* 面板细线 */
+  --rule: 1px;        /* 分区线 */
+  --mark: 2px;        /* 状态标记条（选中 / 正确 / 错误）*/
+  --bracket: 9px;     /* 角标臂长 */
+
+  /* ---- 动效：统一一套，三档不换 ---- */
+  --dur-1: 150ms;
+  --dur-2: 240ms;
+  --dur-3: 340ms;
+  --ease-out: cubic-bezier(.2, .8, .2, 1);
+  --ease-in-out: cubic-bezier(.5, 0, .2, 1);
+  --ease-spring: cubic-bezier(.22, 1.2, .36, 1);
+
+  /* ---- 布局 ---- */
+  --bar-h: 50px;
+  --gutter: 18px;
+  --max-w: 460px;
+  --track-h: 5px;     /* 进度条高度 */
+
+  /* ---- 安全区 ---- */
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+
+  /* ---- 圆角：仪器风一律方角，只留 1-2px 去毛刺 ---- */
+  --radius: 2px;
+  --radius-sm: 1px;
+
+  /* ---- 字体族（全部系统字体，不引外链，保证离线 + 秒开）---- */
+  --font-ui: "HarmonyOS Sans SC", "HarmonyOS Sans", "MiSans", "PingFang SC",
+             "Noto Sans SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+  --font-mono: "HarmonyOS Sans SC", ui-monospace, "SFMono-Regular", "Cascadia Mono",
+               Consolas, "JetBrains Mono", monospace;
+}
+
+/* 等宽号的排版习惯：等宽字距 + 表格数字，读数不跳位 */
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .06em;
+}
